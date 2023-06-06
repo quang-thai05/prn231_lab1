@@ -26,7 +26,7 @@ namespace Lab1.Formatter
             }
         }
 
-        public async override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
+        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
             var httpContext = context.HttpContext;
             var buffer = new StringBuilder();

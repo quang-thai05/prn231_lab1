@@ -19,21 +19,35 @@ namespace Lab1.Formatter
             return type == typeof(OrderDto);
         }
 
-        public async override Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
+        public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
         {
             var httpContext = context.HttpContext;
             using var reader = new StreamReader(httpContext.Request.Body, encoding);
             string? dataLine = null;
             try
             {
-                await ReadLineAsync($"EmployeeId,CustomerId,OrderDate", reader, context);
+                await ReadLineAsync($"EmployeeId,CustomerId,OrderDate,Products", reader, context);
                 dataLine = await ReadLineAsync(null, reader, context);
                 var data = dataLine.Split(',');
+                var products = new List<ProductDto>();
+
+                for (var i = 3; i < data.Length; i += 3)
+                {
+                    var product = new ProductDto
+                    {
+                        ProductId = int.Parse(data[i]),
+                        Quantity = short.Parse(data[i + 1]),
+                        Price = decimal.Parse(data[i + 2])
+                    };
+                    products.Add(product);
+                }
+
                 var order = new OrderDto()
                 {
                     EmployeeId = Convert.ToInt32(data[0]),
                     CustomerId = data[1],
                     OrderDate = Convert.ToDateTime(data[2]),
+                    Products = products
                 };
                 return await InputFormatterResult.SuccessAsync(order);
             }
